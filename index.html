@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ฤกษ์ดี — โหราศาสตร์ไทยรายวัน</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBjMGExNCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U4Yzk3YSI+4pymPC90ZXh0Pgo8L3N2Zz4=">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Noto+Serif+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-ornament">✦ โหราศาสตร์ไทย ✦</div>
+    <h1>ฤกษ์ดี</h1>
+    <p class="subtitle">โหราศาสตร์ไทย · อัปเดตอัตโนมัติ</p>
+    <div class="date-display" id="date-display">—</div><br>
+    
+    <div style="margin-top:8px;">
+      <div class="cal-toggle">
+        <button class="cal-btn active" id="btn-suriyayas" onclick="switchCalendar('suriyayas')">สุริยยาส</button>
+        <button class="cal-btn" id="btn-lahiri" onclick="switchCalendar('lahiri')">ลาหิรี</button>
+      </div>
+    </div>
+    <div class="notif-bar">
+      <button class="notif-btn" id="notif-btn" onclick="toggleNotif()">🔔 แจ้งเตือนฤกษ์</button>
+      <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔇 เสียง</button>
+    </div>
+    <div id="notif-warning" class="notif-warning">⚠ บราวเซอร์ไม่อนุญาตการแจ้งเตือน</div>
+  </header>
+
+  <!-- Clock card (คำนวณ real-time เอง ไม่ต้องพึ่ง myhora) -->
+  <div class="grid">
+    <div class="card">
+      <span class="card-title">⏰ เวลาปัจจุบัน</span>
+      <div class="time-now" id="clock">--:--:--</div>
+      <div class="current-yam">
+        <span class="yam-badge" id="yam-badge" style="background:rgba(201,168,76,0.1);color:var(--gold2);border:1px solid var(--border)">กำลังโหลด...</span>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="sun-times">
+          <span>☀️ ขึ้น <b id="sunrise">—</b></span>
+          <span>ตก <b id="sunset">—</b></span>
+        </div>
+        <div class="sun-bar"><div class="sun-fill" id="sun-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Moon card -->
+    <div class="card">
+      <span class="card-title">🌙 ดวงจันทร์</span>
+      <div class="moon-wrap">
+        <svg id="moon-svg" width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="30" fill="#1a2535" stroke="#445566" stroke-width="0.5"/>
+        </svg>
+        <div class="moon-info">
+          <h2 id="moon-phase-name">—</h2>
+          <p id="moon-dithi">—</p>
+          <div class="illum-bar" style="margin-top:10px;"><div class="illum-fill" id="illum-fill" style="width:0%"></div></div>
+          <div style="font-size:18px;color:var(--text2);margin-top:4px;">แสง <span id="illum-pct">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content area (filled after API call) -->
+  <div id="main-content">
+    <div class="loading" style="margin-top:24px;">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
+
+  <footer></footer>
+</div>
+
+  <script src="app.js"></script>
+<div id="toast-container"></div>
+</body>
+</html>

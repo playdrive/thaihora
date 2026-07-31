@@ -1,0 +1,539 @@
+  :root {
+    --bg: #0c0a14; --bg2: #13101f; --bg3: #1a1628;
+    --gold: #c9a84c; --gold2: #e8c97a; --gold3: #f5e0a0;
+    --silver: #8fa0b8; --text: #e8e0d0; --text2: #a09080;
+    --success: #5a9e70; --warn: #b88a40; --danger: #c06050;
+    --border: rgba(201,168,76,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    font-size:23px;
+    line-height: 1.9;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 78%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 32%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 33% 88%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 55%, rgba(255,255,255,0.45) 0%, transparent 100%);
+  }
+  .container { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:0 16px 60px; }
+
+  header { text-align:center; padding:40px 0 24px; }
+  .header-ornament { font-size:18px; letter-spacing:4px; color:var(--gold); opacity:0.6; margin-bottom:8px; }
+  header h1 { font-family:'Noto Serif Thai',serif; font-size:55px; font-weight:300; color:var(--gold2); letter-spacing:2px; text-shadow:0 0 40px rgba(201,168,76,0.3); }
+  .subtitle { font-size:22px; color:var(--text2); margin-top:6px; }
+  .date-display { margin-top:16px; display:inline-block; padding:8px 24px; border:1px solid var(--border); border-radius:999px; font-size:23px; color:var(--gold3); background:rgba(201,168,76,0.05); }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px; }
+  @media(max-width:640px){ .grid{grid-template-columns:1fr;} }
+
+  .card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:20px;
+    position:relative; overflow:hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+  .card:nth-child(1){animation-delay:0.05s} .card:nth-child(2){animation-delay:0.1s}
+  .card:nth-child(3){animation-delay:0.15s} .card:nth-child(4){animation-delay:0.2s}
+  .card:nth-child(5){animation-delay:0.25s}
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.4; }
+  .card-full { grid-column:1 / -1; }
+  .card-title { font-size:20px; letter-spacing:2px; color:var(--text2); text-transform:uppercase; margin-bottom:12px; font-weight:500; }
+
+  /* Clock */
+  .time-now { font-family:'Noto Serif Thai',serif; font-size:58px; font-weight:300; color:var(--gold2); letter-spacing:4px; text-align:center; text-shadow:0 0 30px rgba(201,168,76,0.4); }
+  .yam-badge { display:inline-block; padding:6px 20px; border-radius:999px; font-size:23px; font-weight:500; }
+  .current-yam { text-align:center; margin-top:6px; }
+  .sun-bar { position:relative; height:6px; background:var(--bg3); border-radius:999px; margin:12px 0; overflow:hidden; }
+  .sun-fill { position:absolute; top:0;left:0; height:100%; background:linear-gradient(90deg,#f5d060,#f08030); border-radius:999px; transition:width 1s ease; }
+  .sun-times { display:flex; justify-content:space-between; font-size:20px; color:var(--text2); }
+
+  /* Moon */
+  .moon-wrap { display:flex; align-items:center; gap:20px; }
+  .moon-info h2 { font-family:'Noto Serif Thai',serif; font-size:31px; font-weight:400; color:var(--gold2); }
+  .moon-info p { font-size:22px; color:var(--text2); margin-top:4px; line-height:1.7; }
+  .illum-bar { margin-top:10px; height:4px; background:var(--bg3); border-radius:999px; overflow:hidden; }
+  .illum-fill { height:100%; background:linear-gradient(90deg,var(--silver),#dde8f8); border-radius:999px; }
+
+  /* Lucky hours */
+  .section-label { font-size:20px; letter-spacing:3px; color:var(--gold); text-transform:uppercase; margin:24px 0 12px; display:flex; align-items:center; gap:12px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .hour-list { display:flex; flex-direction:column; gap:8px; }
+  .hour-item { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:10px; font-size:22px; }
+  .hour-item.good    { background:rgba(90,158,112,0.12); border:1px solid rgba(90,158,112,0.25); }
+  .hour-item.warn    { background:rgba(184,138,64,0.12); border:1px solid rgba(184,138,64,0.25); }
+  .hour-item.bad     { background:rgba(192,96,80,0.12); border:1px solid rgba(192,96,80,0.25); }
+  .hour-item.neutral { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+  .hour-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+  .good    .hour-dot { background:var(--success); box-shadow:0 0 6px var(--success); }
+  .warn    .hour-dot { background:var(--warn); box-shadow:0 0 6px var(--warn); }
+  .bad     .hour-dot { background:var(--danger); box-shadow:0 0 6px var(--danger); }
+  .neutral .hour-dot { background:var(--text2); }
+  .hour-label { flex:1; color:var(--text); }
+  .hour-time  { color:var(--text2); font-size:20px; }
+  .hour-badge { font-size:18px; padding:2px 8px; border-radius:999px; font-weight:600; }
+  .good    .hour-badge { background:rgba(90,158,112,0.3); color:#7ecb96; }
+  .warn    .hour-badge { background:rgba(184,138,64,0.3); color:#d4aa6a; }
+  .bad     .hour-badge { background:rgba(192,96,80,0.3); color:#e08878; }
+  .neutral .hour-badge { background:rgba(255,255,255,0.08); color:var(--text2); }
+
+  /* Planets */
+  .planet-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  @media(max-width:640px){ .planet-grid{grid-template-columns:repeat(2,1fr);} }
+  .planet-item { background:var(--bg3); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; text-align:center; }
+  .planet-symbol { font-size:31px; display:block; margin-bottom:4px; }
+  .planet-name { font-size:20px; color:var(--text2); display:block; margin-bottom:2px; }
+  .planet-pos { font-size:22px; color:var(--gold3); font-weight:500; }
+  .planet-deg { font-size:20px; color:var(--text2); margin-top:2px; }
+  .retro { font-size:18px; color:var(--danger); }
+
+  /* Loading / Error */
+  .loading { text-align:center; padding:40px; color:var(--text2); }
+  .spinner { display:inline-block; width:32px;height:32px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:12px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .error-box { background:rgba(192,96,80,0.1); border:1px solid rgba(192,96,80,0.3); border-radius:12px; padding:20px; text-align:center; }
+  .error-box h3 { color:var(--danger); margin-bottom:8px; }
+  .error-box p { color:var(--text2); font-size:22px; line-height:1.8; }
+  .retry-btn { margin-top:12px; padding:8px 20px; background:rgba(201,168,76,0.15); border:1px solid var(--border); border-radius:8px; color:var(--gold2); cursor:pointer; font-family:'Sarabun',sans-serif; font-size:22px; }
+  .retry-btn:hover { background:rgba(201,168,76,0.25); }
+
+  /* Source badge */
+  .source-badge { display:inline-flex; align-items:center; gap:6px; font-size:18px; color:var(--text2); padding:4px 10px; border:1px solid var(--border); border-radius:999px; margin-top:8px; }
+  .source-dot { width:6px;height:6px;border-radius:50%;background:var(--success); box-shadow:0 0 4px var(--success); }
+
+
+  /* Calendar toggle */
+  .cal-toggle { display:inline-flex; gap:0; border:1px solid var(--border); border-radius:999px; overflow:hidden; margin-top:10px; }
+  .cal-btn { padding:6px 18px; font-size:20px; font-family:'Sarabun',sans-serif; cursor:pointer; border:none; background:transparent; color:var(--text2); transition:all 0.2s; }
+  .cal-btn.active { background:rgba(201,168,76,0.2); color:var(--gold2); }
+  .cal-btn:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.05); }
+
+  /* Yam slot rows */
+  .yam-slots { display:flex; flex-direction:column; gap:3px; margin-top:4px; }
+  .yam-slot-row { font-size:20px; color:var(--text2); display:flex; align-items:center; gap:6px; }
+  .yam-slot-dot { width:5px;height:5px;border-radius:50%;opacity:0.7; flex-shrink:0; }
+  .good .yam-slot-dot { background:var(--success); }
+  .warn .yam-slot-dot { background:var(--warn); }
+  .bad  .yam-slot-dot { background:var(--danger); }
+
+  /* Notification bell & toast */
+  .notif-bar { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px; }
+  .notif-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 16px; border:1px solid var(--border); border-radius:999px; background:transparent; color:var(--text2); font-family:'Sarabun',sans-serif; font-size:20px; cursor:pointer; transition:all 0.2s; }
+  .notif-btn:hover { border-color:var(--gold); color:var(--gold2); }
+  .notif-btn.enabled { border-color:rgba(90,158,112,0.5); color:#7ecb96; background:rgba(90,158,112,0.08); }
+  .notif-btn.denied  { border-color:rgba(192,96,80,0.4); color:#e08878; cursor:default; }
+  .notif-warning { font-size:18px; color:var(--warn); margin-top:4px; display:none; }
+
+  /* ── Date picker ── */
+  .date-picker-bar { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:32px; margin-bottom:8px; flex-wrap:wrap; padding:16px 0; border-top:1px solid var(--border); }
+  .date-picker-bar label { font-size:20px; color:var(--text2); }
+  .date-picker-wrap { position:relative; display:inline-block; }
+  .date-picker-input { padding:5px 32px 5px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:999px;
+    color:var(--gold2); font-family:'Sarabun',sans-serif; font-size:20px; outline:none; cursor:pointer;
+    transition:border-color .2s; width:210px; text-align:center; }
+  .date-picker-input:focus { border-color:rgba(201,168,76,0.5); }
+  .date-picker-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    font-size:20px; pointer-events:none; opacity:0.5; }
+  /* ── Custom calendar popup ── */
+  .cal-popup { position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%);
+    background:var(--bg2); border:1px solid rgba(201,168,76,0.25); border-radius:16px;
+    padding:14px; z-index:9000; min-width:264px; box-shadow:0 12px 40px rgba(0,0,0,0.6);
+    animation:calIn 0.18s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes calIn { from{opacity:0;transform:translateX(-50%) translateY(-6px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-nav { background:none; border:1px solid var(--border); border-radius:8px; color:var(--gold2);
+    width:28px; height:28px; cursor:pointer; font-size:22px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+  .cal-nav:hover { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+  .cal-month-label { font-family:'Noto Serif Thai',serif; font-size:22px; color:var(--gold2); padding:2px 8px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-dow { font-size:18px; color:var(--text2); text-align:center; padding:4px 0; }
+  .cal-dow.sun-h { color:#e08878; } .cal-dow.sat-h { color:#8fa0c8; }
+  .cal-day { font-size:20px; text-align:center; padding:6px 2px; border-radius:8px;
+    cursor:pointer; color:var(--text); transition:all .12s; border:1px solid transparent; }
+  .cal-day:hover:not(.empty) { background:rgba(201,168,76,0.15); border-color:rgba(201,168,76,0.3); }
+  .cal-day.today { border-color:rgba(201,168,76,0.5); color:var(--gold2); font-weight:600; }
+  .cal-day.selected { background:rgba(201,168,76,0.25); border-color:var(--gold); color:var(--gold3); font-weight:700; }
+  .cal-day.other-month { color:var(--text2); opacity:0.35; }
+  .cal-day.sun-col { color:#e08878; } .cal-day.sat-col { color:#8fa0c8; }
+  .cal-day.empty { cursor:default; }
+  .date-today-btn { padding:5px 14px; background:transparent; border:1px solid var(--border); border-radius:999px;
+    color:var(--text2); font-family:'Sarabun',sans-serif; font-size:20px; cursor:pointer; transition:all .2s; }
+  .date-today-btn:hover { color:var(--gold2); border-color:var(--gold); }
+  .date-today-btn.active { color:var(--gold2); border-color:rgba(201,168,76,0.5); background:rgba(201,168,76,0.08); }
+
+  /* ── Sound notif button ── */
+  .sound-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 16px; border:1px solid var(--border);
+    border-radius:999px; background:transparent; color:var(--text2); font-family:'Sarabun',sans-serif;
+    font-size:20px; cursor:pointer; transition:all 0.2s; }
+  .sound-btn:hover { border-color:var(--gold); color:var(--gold2); }
+  .sound-btn.enabled { border-color:rgba(90,158,112,0.5); color:#7ecb96; background:rgba(90,158,112,0.08); }
+
+  /* In-app toast */
+  #toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+  .toast { display:flex; align-items:flex-start; gap:12px; padding:14px 18px; border-radius:14px; min-width:260px; max-width:340px; pointer-events:all;
+    backdrop-filter:blur(12px); animation:toastIn 0.35s cubic-bezier(.2,.8,.3,1) both; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  .toast.good { background:rgba(20,40,28,0.92); border:1px solid rgba(90,158,112,0.4); }
+  .toast.warn { background:rgba(38,28,10,0.92); border:1px solid rgba(184,138,64,0.4); }
+  .toast.bad  { background:rgba(38,18,14,0.92); border:1px solid rgba(192,96,80,0.35); }
+  .toast.info { background:rgba(18,14,30,0.92); border:1px solid var(--border); }
+  .toast-icon { font-size:31px; flex-shrink:0; margin-top:1px; }
+  .toast-body { flex:1; }
+  .toast-title { font-size:20px; font-weight:600; color:var(--text); margin-bottom:3px; }
+  .toast-sub   { font-size:20px; color:var(--text2); line-height:1.5; }
+  .toast-close { background:none; border:none; color:var(--text2); cursor:pointer; font-size:24px; padding:0 0 0 4px; line-height:1; flex-shrink:0; }
+  .toast-close:hover { color:var(--text); }
+  @keyframes toastIn  { from{opacity:0;transform:translateY(16px) scale(.95)} to{opacity:1;transform:none} }
+  @keyframes toastOut { from{opacity:1;transform:none} to{opacity:0;transform:translateY(8px) scale(.95)} }
+
+  /* ── ฤกษ์วิเคราะห์ section ── */
+  .activity-tabs { display:flex; gap:8px; margin-bottom:14px; }
+  .act-tab { padding:8px 20px; border-radius:999px; border:1px solid var(--border); background:transparent;
+    color:var(--text2); font-family:'Sarabun',sans-serif; font-size:20px; cursor:pointer; transition:all .2s; }
+  .act-tab.active { background:rgba(201,168,76,0.15); color:var(--gold2); border-color:rgba(201,168,76,0.4); }
+  .act-tab:hover:not(.active) { color:var(--text); border-color:rgba(255,255,255,0.15); }
+
+  .fengri-card { border-radius:14px; padding:18px 20px; margin-bottom:10px;
+    border:1px solid var(--border); background:var(--bg3); position:relative; }
+  .fengri-card.best  { border-color:rgba(90,158,112,0.4); background:rgba(90,158,112,0.06); }
+  .fengri-card.ok    { border-color:rgba(184,138,64,0.35); background:rgba(184,138,64,0.05); }
+  .fengri-card.avoid { border-color:rgba(192,96,80,0.3);  background:rgba(192,96,80,0.04); }
+  .fengri-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .fengri-rank { font-size:26px; flex-shrink:0; }
+  .fengri-name { font-size:23px; font-weight:600; color:var(--text); }
+  .fengri-badge { margin-left:auto; font-size:18px; padding:3px 10px; border-radius:999px; font-weight:600; }
+  .best  .fengri-badge { background:rgba(90,158,112,0.25);  color:#7ecb96; }
+  .ok    .fengri-badge { background:rgba(184,138,64,0.25);   color:#d4aa6a; }
+  .avoid .fengri-badge { background:rgba(192,96,80,0.2);    color:#e08878; }
+  .fengri-slots { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  .fengri-slot { display:inline-flex; align-items:center; gap:5px; padding:5px 13px;
+    border-radius:8px; font-size:20px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); }
+  .fengri-slot .slot-dot { width:6px;height:6px;border-radius:50%; flex-shrink:0; }
+  .best  .fengri-slot .slot-dot { background:var(--success); box-shadow:0 0 5px var(--success); }
+  .ok    .fengri-slot .slot-dot { background:var(--warn); }
+  .avoid .fengri-slot .slot-dot { background:var(--danger); }
+  .fengri-tip { font-size:20px; color:var(--text2); line-height:1.7; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; margin-top:4px; }
+
+  .ai-box { background:rgba(201,168,76,0.04); border:1px solid rgba(201,168,76,0.15);
+    border-radius:12px; padding:16px 18px; margin-top:14px; }
+  .ai-box-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:18px; letter-spacing:2px; color:var(--gold); }
+  .ai-body { font-size:22px; color:var(--text); line-height:1.9; white-space:pre-wrap; }
+  .ai-body.loading { color:var(--text2); font-style:italic; }
+  .ai-reload { float:right; background:none; border:1px solid var(--border); border-radius:8px;
+    color:var(--text2); font-size:18px; padding:3px 10px; cursor:pointer; font-family:'Sarabun',sans-serif; margin-top:-2px; }
+  .ai-reload:hover { color:var(--gold2); border-color:var(--gold); }
+
+  .now-indicator { display:inline-flex; align-items:center; gap:5px; font-size:18px;
+    color:#7ecb96; background:rgba(90,158,112,0.12); border:1px solid rgba(90,158,112,0.3);
+    border-radius:999px; padding:2px 8px; margin-left:8px; vertical-align:middle; }
+  .now-dot { width:5px;height:5px;border-radius:50%;background:#7ecb96;
+    box-shadow:0 0 6px #7ecb96; animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── ฤกษ์ดาว + ดิถีเพียร cards ── */
+  .info-row  { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:0; }
+  @media(max-width:640px){ .info-row{grid-template-columns:1fr;} }
+  .info-card { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+  .info-card.good-border  { border-color:rgba(90,158,112,0.4); }
+  .info-card.warn-border  { border-color:rgba(184,138,64,0.35); }
+  .info-card.bad-border   { border-color:rgba(192,96,80,0.3); }
+  .info-label { font-size:18px; letter-spacing:2px; color:var(--text2); text-transform:uppercase; margin-bottom:8px; }
+  .info-main  { font-family:'Noto Serif Thai',serif; font-size:29px; font-weight:400; color:var(--gold2); }
+  .info-num   { font-size:20px; color:var(--text2); margin-top:2px; }
+  .info-q-badge { display:inline-block; margin-top:8px; font-size:20px; padding:3px 10px;
+    border-radius:999px; font-weight:600; }
+  .good-q { background:rgba(90,158,112,0.18); color:#7ecb96; border:1px solid rgba(90,158,112,0.3); }
+  .warn-q { background:rgba(184,138,64,0.18); color:#d4aa6a; border:1px solid rgba(184,138,64,0.3); }
+  .bad-q  { background:rgba(192,96,80,0.18);  color:#e08878; border:1px solid rgba(192,96,80,0.3); }
+  .info-end   { font-size:18px; color:var(--text2); margin-top:6px; }
+
+  /* ── เลขศาสตร์ ── */
+  .numro-wrap { max-width:560px; }
+  .numro-input-row { display:flex; gap:10px; margin-bottom:14px; align-items:flex-end; }
+  .numro-field { flex:1; }
+  .numro-field label { display:block; font-size:18px; letter-spacing:1px; color:var(--text2); margin-bottom:6px; }
+  .numro-field input {
+    width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:'Sarabun',sans-serif; font-size:23px;
+    letter-spacing:3px; outline:none; transition:border-color .2s;
+  }
+  .numro-field input:focus { border-color:rgba(201,168,76,0.5); }
+  .numro-field input::placeholder { letter-spacing:1px; font-size:20px; color:var(--text2); opacity:.5; }
+  .numro-btn { padding:10px 20px; background:rgba(201,168,76,0.15); border:1px solid var(--border);
+    border-radius:10px; color:var(--gold2); font-family:'Sarabun',sans-serif; font-size:20px;
+    cursor:pointer; white-space:nowrap; transition:all .2s; flex-shrink:0; }
+  .numro-btn:hover { background:rgba(201,168,76,0.25); border-color:var(--gold); }
+
+  .numro-result { margin-top:4px; }
+  .digit-row { display:flex; gap:6px; flex-wrap:wrap; margin:12px 0 8px; }
+  .digit-box { width:38px; height:48px; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; border-radius:10px; border:1px solid rgba(255,255,255,0.08);
+    background:var(--bg3); transition:all .3s; cursor:default; position:relative; }
+  .digit-box .d-num { font-size:29px; font-weight:600; line-height:1; }
+  .digit-box .d-planet { font-size:17px; color:var(--text2); margin-top:2px; }
+  .digit-box.sun    { border-color:rgba(255,200,50,0.4);  background:rgba(255,200,50,0.07);  }
+  .digit-box.moon   { border-color:rgba(180,210,255,0.4); background:rgba(180,210,255,0.06); }
+  .digit-box.jupit  { border-color:rgba(90,158,112,0.4);  background:rgba(90,158,112,0.07);  }
+  .digit-box.rahu   { border-color:rgba(130,100,200,0.4); background:rgba(130,100,200,0.07); }
+  .digit-box.merc   { border-color:rgba(100,200,180,0.4); background:rgba(100,200,180,0.07); }
+  .digit-box.venus  { border-color:rgba(255,150,180,0.4); background:rgba(255,150,180,0.07); }
+  .digit-box.ketu   { border-color:rgba(160,120,80,0.4);  background:rgba(160,120,80,0.07);  }
+  .digit-box.saturn { border-color:rgba(192,96,80,0.4);   background:rgba(192,96,80,0.07);   }
+  .digit-box.mars   { border-color:rgba(220,80,60,0.4);   background:rgba(220,80,60,0.07);   }
+
+  .numro-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0; }
+  @media(max-width:480px){ .numro-summary{grid-template-columns:1fr 1fr;} }
+  .numro-stat { background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+    padding:10px 12px; text-align:center; }
+  .numro-stat-label { font-size:18px; color:var(--text2); margin-bottom:4px; }
+  .numro-stat-val { font-family:'Noto Serif Thai',serif; font-size:31px; color:var(--gold2); }
+  .numro-stat-sub { font-size:20px; color:var(--text2); margin-top:2px; }
+
+  .numro-tabs { display:flex; gap:6px; margin-bottom:14px; }
+  .numro-tab { padding:7px 16px; border-radius:999px; border:1px solid var(--border);
+    background:transparent; color:var(--text2); font-family:'Sarabun',sans-serif;
+    font-size:20px; cursor:pointer; transition:all .2s; }
+  .numro-tab.active { background:rgba(201,168,76,0.15); color:var(--gold2); border-color:rgba(201,168,76,0.4); }
+  .numro-tab:hover:not(.active) { color:var(--text); }
+
+  /* ── สีประจำวัน ── */
+  .daycolor-hero { display:flex; align-items:center; gap:20px; padding:4px 0 16px; }
+  .daycolor-swatches { display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch-wrap { display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .swatch { width:48px; height:48px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.3);
+    transition:transform .2s; cursor:default; border:2px solid rgba(255,255,255,0.1); }
+  .swatch:hover { transform:scale(1.1); }
+  .swatch-label { font-size:18px; color:var(--text2); text-align:center; max-width:52px; line-height:1.3; }
+  .swatch.lucky  { border-color:rgba(90,158,112,0.6); box-shadow:0 4px 20px rgba(90,158,112,0.3); }
+  .swatch.taboo  { border-color:rgba(192,96,80,0.5); opacity:.7; }
+
+  .daycolor-info { flex:1; min-width:0; }
+  .daycolor-day  { font-family:'Noto Serif Thai',serif; font-size:31px; color:var(--gold2); }
+  .daycolor-planet { font-size:20px; color:var(--text2); margin-top:2px; margin-bottom:12px; }
+  /* มือถือ: stack แนวตั้ง (swatches อยู่บน, ข้อมูลอยู่ล่างเต็มความกว้าง) กันข้อความโดนบีบ/ตัด */
+  @media(max-width:640px){
+    .daycolor-hero { flex-direction:column; align-items:stretch; gap:14px; }
+    .daycolor-info { width:100%; }
+    .daycolor-swatches { justify-content:flex-start; }
+  }
+  .color-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px; }
+  @media(max-width:640px){ .color-grid{grid-template-columns:1fr;} }
+  .color-card { border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); }
+  .color-card-top { height:56px; display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:600; letter-spacing:.5px; }
+  .color-card-body { padding:10px 12px; background:var(--bg3); }
+  .color-card-name { font-size:22px; color:var(--text); font-weight:500; margin-bottom:2px; }
+  .color-card-hex  { font-size:18px; color:var(--text2); font-family:monospace; margin-bottom:4px; }
+  .color-card-tag  { display:inline-block; font-size:18px; padding:2px 8px; border-radius:999px; }
+  .tag-lucky  { background:rgba(90,158,112,0.2); color:#7ecb96; }
+  .tag-ok     { background:rgba(184,138,64,0.2);  color:#d4aa6a; }
+  .tag-taboo  { background:rgba(192,96,80,0.2);   color:#e08878; }
+  .tag-avoid  { background:rgba(120,100,80,0.15); color:var(--text2); }
+
+  .color-meaning { font-size:20px; color:var(--text2); line-height:1.7; margin-top:10px; }
+  .wear-tip { background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.12);
+    border-radius:10px; padding:14px 16px; margin-top:12px; font-size:20px;
+    color:var(--text2); line-height:1.8; }
+  .wear-tip b { color:var(--gold3); }
+
+  /* ── ดวงชะตาส่วนตัว ── */
+  .personal-form { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-bottom:6px; }
+  .personal-field { display:flex; flex-direction:column; gap:5px; }
+  .personal-field label { font-size:18px; letter-spacing:1px; color:var(--text2); }
+  .personal-field input, .personal-field select {
+    padding:9px 14px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:'Sarabun',sans-serif; font-size:22px;
+    outline:none; transition:border-color .2s; min-width:120px;
+  }
+  .personal-field input:focus, .personal-field select:focus { border-color:rgba(201,168,76,0.5); }
+  .personal-field select option { background:var(--bg3); }
+  .personal-analyze-btn {
+    padding:9px 22px; background:rgba(201,168,76,0.18); border:1px solid rgba(201,168,76,0.4);
+    border-radius:10px; color:var(--gold2); font-family:'Sarabun',sans-serif; font-size:22px;
+    cursor:pointer; transition:all .2s; white-space:nowrap; align-self:flex-end;
+  }
+  .personal-analyze-btn:hover { background:rgba(201,168,76,0.3); }
+  .personal-analyze-btn:disabled { opacity:.5; cursor:default; }
+
+  .chart-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0; }
+  @media(max-width:640px){ .chart-grid{grid-template-columns:repeat(2,1fr);} }
+  .chart-item { background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+    padding:12px; text-align:center; }
+  .chart-item-icon { font-size:31px; display:block; margin-bottom:4px; }
+  .chart-item-label { font-size:18px; color:var(--text2); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+  .chart-item-val { font-family:'Noto Serif Thai',serif; font-size:24px; color:var(--gold2); }
+  .chart-item-sub { font-size:18px; color:var(--text2); margin-top:3px; }
+
+  .compat-row { display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; }
+  .compat-pill { padding:6px 14px; border-radius:999px; font-size:20px; font-weight:600; }
+  .compat-great { background:rgba(90,158,112,0.2); color:#7ecb96; border:1px solid rgba(90,158,112,0.3); }
+  .compat-good  { background:rgba(201,168,76,0.15); color:var(--gold2); border:1px solid rgba(201,168,76,0.3); }
+  .compat-warn  { background:rgba(184,138,64,0.15); color:#d4aa6a; border:1px solid rgba(184,138,64,0.3); }
+  .compat-bad   { background:rgba(192,96,80,0.15); color:#e08878; border:1px solid rgba(192,96,80,0.3); }
+
+  .personal-section-title { font-size:20px; letter-spacing:2px; color:var(--gold); text-transform:uppercase;
+    margin:18px 0 10px; display:flex; align-items:center; gap:10px; }
+  .personal-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .factor-table { width:100%; border-collapse:collapse; font-size:20px; margin:8px 0; }
+  .factor-table th { text-align:left; padding:6px 10px; color:var(--text2); font-weight:500;
+    font-size:18px; letter-spacing:1px; border-bottom:1px solid var(--border); }
+  .factor-table td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+  .factor-table tr:last-child td { border-bottom:none; }
+  .factor-name { color:var(--gold3); font-weight:500; }
+  .factor-val  { color:var(--text); }
+  .factor-note { color:var(--text2); font-size:20px; }
+
+  .today-score { display:flex; align-items:center; gap:12px; padding:14px 16px;
+    border-radius:12px; margin:12px 0; }
+  .today-score.great { background:rgba(90,158,112,0.1); border:1px solid rgba(90,158,112,0.3); }
+  .today-score.good  { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); }
+  .today-score.mixed { background:rgba(184,138,64,0.08); border:1px solid rgba(184,138,64,0.25); }
+  .today-score.caution { background:rgba(192,96,80,0.08); border:1px solid rgba(192,96,80,0.25); }
+  .score-num { font-family:'Noto Serif Thai',serif; font-size:58px; font-weight:300; line-height:1; }
+  .score-num.great { color:#7ecb96; }
+  .score-num.good  { color:var(--gold2); }
+  .score-num.mixed { color:#d4aa6a; }
+  .score-num.caution { color:#e08878; }
+  .score-info { flex:1; }
+  .score-title { font-size:24px; font-weight:500; color:var(--text); margin-bottom:4px; }
+  .score-desc { font-size:20px; color:var(--text2); line-height:1.7; }
+  .score-bar-wrap { margin-top:8px; }
+  .score-bar { height:4px; background:var(--bg3); border-radius:999px; overflow:hidden; }
+  .score-bar-fill { height:100%; border-radius:999px; transition:width 1s ease; }
+  .score-bar-fill.great { background:linear-gradient(90deg,#5a9e70,#7ecb96); }
+  .score-bar-fill.good  { background:linear-gradient(90deg,#c9a84c,#e8c97a); }
+  .score-bar-fill.mixed { background:linear-gradient(90deg,#b88a40,#d4aa6a); }
+  .score-bar-fill.caution { background:linear-gradient(90deg,#c06050,#e08878); }
+
+  .personal-save-note { font-size:18px; color:var(--text2); margin-top:8px; opacity:.7; }
+
+  /* ── วิเคราะห์ดาว ── */
+  .planet-item { position:relative; }
+  .planet-item.malefic { border-color:rgba(192,96,80,0.35)!important; background:rgba(192,96,80,0.06)!important; }
+  .planet-item.benefic { border-color:rgba(90,158,112,0.3)!important; }
+  .planet-item.conjunct { border-color:rgba(201,168,76,0.5)!important; box-shadow:0 0 8px rgba(201,168,76,0.15); }
+  .conj-badge { position:absolute; top:5px; right:5px; font-size:17px; padding:1px 5px;
+    border-radius:999px; background:rgba(201,168,76,0.2); color:var(--gold3); }
+  .retro { font-size:18px; color:var(--danger); }
+
+  .planet-analysis { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .pa-row { display:flex; align-items:flex-start; gap:10px; padding:12px 14px;
+    border-radius:10px; font-size:22px; }
+  .pa-row.good  { background:rgba(90,158,112,0.08);  border:1px solid rgba(90,158,112,0.2); }
+  .pa-row.warn  { background:rgba(184,138,64,0.08);   border:1px solid rgba(184,138,64,0.2); }
+  .pa-row.bad   { background:rgba(192,96,80,0.08);    border:1px solid rgba(192,96,80,0.2); }
+  .pa-row.info  { background:rgba(255,255,255,0.03);  border:1px solid rgba(255,255,255,0.06); }
+  .pa-icon { font-size:26px; flex-shrink:0; }
+  .pa-text { flex:1; color:var(--text); line-height:1.6; }
+  .pa-text b { color:var(--gold3); }
+
+  /* AI unavailable */
+  .ai-box.ai-hidden { display:none; }
+  .ai-unavail-note { font-size:20px; color:var(--text2); font-style:italic;
+    padding:4px 0; opacity:0.6; display:none; }
+  .ai-unavail-note.show { display:block; }
+
+  /* ── ดาวย้ายกระทบชะตาเกิด ── */
+  .transit-list { display:flex; flex-direction:column; gap:12px; }
+  .transit-card { border-radius:13px; padding:14px 16px; border:1px solid var(--border);
+    background:var(--bg3); position:relative; overflow:hidden; }
+  .transit-card::before { content:''; position:absolute; left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px; }
+  .transit-card.tr-great::before { background:linear-gradient(180deg,#7ecb96,#5a9e70); }
+  .transit-card.tr-good::before  { background:linear-gradient(180deg,#e8c97a,#c9a84c); }
+  .transit-card.tr-warn::before  { background:linear-gradient(180deg,#d4aa6a,#b88a40); }
+  .transit-card.tr-bad::before   { background:linear-gradient(180deg,#e08878,#c06050); }
+  .transit-card.tr-great { border-color:rgba(90,158,112,0.3);  background:rgba(90,158,112,0.05); }
+  .transit-card.tr-good  { border-color:rgba(201,168,76,0.25); background:rgba(201,168,76,0.04); }
+  .transit-card.tr-warn  { border-color:rgba(184,138,64,0.3);  background:rgba(184,138,64,0.05); }
+  .transit-card.tr-bad   { border-color:rgba(192,96,80,0.3);   background:rgba(192,96,80,0.05); }
+
+  .tr-top { display:flex; align-items:flex-start; gap:12px; }
+  .tr-sym { font-size:34px; flex-shrink:0; line-height:1; margin-top:2px; }
+  .tr-meta { flex:1; min-width:0; }
+  .tr-name { font-size:23px; font-weight:600; color:var(--text); }
+  .tr-rasi { font-size:19px; color:var(--text2); margin-top:2px; }
+  .tr-badge { font-size:18px; padding:3px 10px; border-radius:999px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+  .tr-great .tr-badge { background:rgba(90,158,112,0.25); color:#7ecb96; }
+  .tr-good  .tr-badge { background:rgba(201,168,76,0.2);  color:var(--gold3); }
+  .tr-warn  .tr-badge { background:rgba(184,138,64,0.2);  color:#d4aa6a; }
+  .tr-bad   .tr-badge { background:rgba(192,96,80,0.2);   color:#e08878; }
+
+  /* timeline dates */
+  .tr-timeline { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 6px; }
+  .tr-date-pill { display:inline-flex; flex-direction:column; align-items:center;
+    padding:6px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.03); font-size:19px; }
+  .tr-date-label { font-size:17px; color:var(--text2); margin-bottom:2px; letter-spacing:.5px; }
+  .tr-date-val   { color:var(--gold3); font-weight:500; }
+  .tr-date-pill.ingress  { border-color:rgba(90,158,112,0.25);  background:rgba(90,158,112,0.06); }
+  .tr-date-pill.egress   { border-color:rgba(192,96,80,0.2);    background:rgba(192,96,80,0.04); }
+  .tr-date-pill.exact    { border-color:rgba(201,168,76,0.3);   background:rgba(201,168,76,0.06); }
+  .tr-date-pill.duration { border-color:rgba(140,160,200,0.2);  background:rgba(140,160,200,0.04); }
+
+  .tr-aspects { display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+  .tr-asp-row { display:flex; align-items:center; gap:8px; font-size:19px;
+    padding:6px 10px; border-radius:8px; background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05); }
+  .tr-asp-icon { font-size:22px; flex-shrink:0; }
+  .tr-asp-name { color:var(--text); flex:1; line-height:1.4; }
+  .tr-asp-date { color:var(--gold2); font-size:19px; font-weight:500; white-space:nowrap; }
+  .tr-asp-retro { font-size:17px; color:var(--danger); margin-left:4px; }
+
+  .tr-desc { font-size:20px; color:var(--text2); line-height:1.75; border-top:1px solid rgba(255,255,255,0.05);
+    padding-top:8px; margin-top:8px; }
+  .tr-ref  { font-size:17px; color:var(--text2); opacity:.5; margin-top:4px; font-style:italic; }
+
+  .tr-summary-box { background:rgba(201,168,76,0.04); border:1px solid rgba(201,168,76,0.12);
+    border-radius:12px; padding:12px 16px; margin-bottom:14px; }
+  .tr-summary-title { font-size:20px; color:var(--gold); margin-bottom:8px; }
+  .tr-summary-grid { display:flex; gap:14px; flex-wrap:wrap; }
+  .tr-summary-stat { text-align:center; }
+  .tr-summary-num  { font-family:'Noto Serif Thai',serif; font-size:34px; line-height:1; }
+  .tr-summary-lbl  { font-size:18px; color:var(--text2); }
+  .tr-summary-num.great { color:#7ecb96; }
+  .tr-summary-num.warn  { color:#d4aa6a; }
+  .tr-summary-num.bad   { color:#e08878; }
+
+  .tr-loading { text-align:center; padding:24px; color:var(--text2); font-style:italic; font-size:20px; }
+  .tr-source  { font-size:17px; color:var(--text2); opacity:.45; margin-top:12px;
+    padding-top:8px; border-top:1px solid rgba(255,255,255,0.04); font-style:italic; }
+
+  footer { text-align:center; padding:40px 0 20px; font-size:20px; color:var(--text2); opacity:0.5; }
+
+  /* ── สถิติสลากกินแบ่ง ── */
+  .lotto-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  @media(max-width:640px){ .lotto-grid{grid-template-columns:1fr;} }
+  .lotto-panel { background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  .lotto-panel-title { font-size:18px; letter-spacing:2px; color:var(--gold); margin-bottom:10px; text-transform:uppercase; }
+  .lotto-freq-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:20px; }
+  .lotto-freq-row:last-child { border-bottom:none; }
+  .lotto-num { font-family:'Noto Serif Thai',serif; font-size:24px; font-weight:600; color:var(--gold2); min-width:54px; }
+  .lotto-bar { flex:1; height:6px; background:var(--bg); border-radius:999px; overflow:hidden; }
+  .lotto-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--gold),var(--gold2)); }
+  .lotto-cnt { font-size:18px; color:var(--text2); min-width:32px; text-align:right; }
+  .lotto-hot { color:#e08878; font-weight:600; }
+  .lotto-cold { color:#8fa0b8; }
+  .lotto-tag { display:inline-block; padding:2px 8px; border-radius:999px; font-size:17px; font-weight:600; margin-left:4px; }
+  .lotto-tag.hot  { background:rgba(192,96,80,0.2);  color:#e08878; border:1px solid rgba(192,96,80,0.3); }
+  .lotto-tag.cold { background:rgba(143,160,184,0.15); color:#8fa0b8; border:1px solid rgba(143,160,184,0.25); }
+  .lotto-history { display:flex; flex-direction:column; gap:5px; }
+  .lotto-hist-row { display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); font-size:20px; flex-wrap:wrap; }
+  .lotto-hist-date { color:var(--text2); font-size:18px; min-width:150px; }
+  .lotto-hist-f1 { font-family:'Noto Serif Thai',serif; font-size:22px; color:var(--gold2); font-weight:600; }
+  .lotto-hist-tag { font-size:18px; color:var(--text2); }
+  .lotto-hist-nums { display:flex; gap:5px; flex-wrap:wrap; }
+  .lotto-hist-num { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:18px; color:var(--text); }
+  .lotto-never { display:flex; flex-wrap:wrap; gap:5px; }
+  .lotto-never-num { background:rgba(143,160,184,0.1); border:1px solid rgba(143,160,184,0.2); border-radius:6px; padding:3px 9px; font-size:19px; color:#8fa0b8; }
+  .lotto-summary-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+  .lotto-summary-stat { text-align:center; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:10px 18px; }
+  .lotto-summary-num { font-family:'Noto Serif Thai',serif; font-size:32px; line-height:1; color:var(--gold2); }
+  .lotto-summary-lbl { font-size:17px; color:var(--text2); margin-top:3px; }
+
