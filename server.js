@@ -762,11 +762,12 @@ app.get('/api/ai-status', rateLimit, async (req, res) => {
 });
 
 app.post('/api/analyze', rateLimit, async (req, res) => {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error:'ANTHROPIC_API_KEY ยังไม่ได้ตั้งค่า' });
+  // ตรวจ input ของผู้เรียกก่อน (400) แล้วค่อยตรวจ config ฝั่ง server (500)
   const { prompt, max_tokens } = req.body;
   if (!prompt || typeof prompt !== 'string') return res.status(400).json({ error:'ต้องระบุ prompt' });
   if (prompt.length > 20000) return res.status(400).json({ error:'prompt ยาวเกินกำหนด' });
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error:'ANTHROPIC_API_KEY ยังไม่ได้ตั้งค่า' });
   // cap max_tokens ฝั่ง server — กันผู้เรียกกำหนดค่าสูงจนสิ้นเปลืองเครดิต
   const capped = Math.min(Math.max(parseInt(max_tokens, 10) || 1200, 1), MAX_TOKENS_CAP);
   try {
