@@ -833,7 +833,20 @@ async function ghGetFile(repoPath) {
   if (!r.ok) throw new Error(`GitHub read ${repoPath} ล้มเหลว: ${r.status} ${await r.text()}`);
   const json = await r.json();
   _ghShaCache[repoPath] = json.sha;
-  return Buffer.from(json.content, 'base64').toString('utf8');
+  if (json.content) {
+    // ไฟล์เล็กกว่า 1MB — Contents API แนบ content (base64) มาให้เลย
+    return Buffer.from(json.content, 'base64').toString('utf8');
+  }
+  // ไฟล์ใหญ่กว่า 1MB — Contents API "ไม่แนบ content มาให้แบบเงียบๆ" (ไม่ error)
+  // ต้องดึงเนื้อหาจริงจาก download_url แทน ไม่งั้นจะเข้าใจผิดว่าไฟล์ว่างเปล่า
+  if (json.download_url) {
+    const rawRes = await fetch(json.download_url, {
+      headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, 'User-Agent': 'ruek-dee-server' }
+    });
+    if (!rawRes.ok) throw new Error(`GitHub read (raw) ${repoPath} ล้มเหลว: ${rawRes.status}`);
+    return rawRes.text();
+  }
+  throw new Error(`GitHub read ${repoPath}: ไม่พบทั้ง content และ download_url ในผลลัพธ์`);
 }
 
 async function ghPutFile(repoPath, content) {
@@ -864,14 +877,17 @@ async function restoreFromGitHub(repoPath, localPath) {
   if (!GITHUB_ENABLED) return;
   try {
     const content = await ghGetFile(repoPath);
-    if (content !== null) {
-      fs.writeFileSync(localPath, content, 'utf8');
-      console.log(`[github-sync] กู้คืน ${repoPath} จาก GitHub สำเร็จ`);
-    } else {
+    if (content === null) {
       console.log(`[github-sync] ยังไม่มี ${repoPath} ใน GitHub (เริ่มจากไฟล์ว่าง)`);
+      return;
     }
+    // เช็กว่า parse เป็น JSON ได้จริงก่อนเขียนทับไฟล์ local เสมอ — กันกรณีดึงมาไม่ครบ/
+    // เสียหาย (เช่น network ขาดกลางทาง) แล้วดันไปเขียนทับข้อมูลดีๆ ที่มีอยู่ทิ้ง
+    JSON.parse(content);
+    fs.writeFileSync(localPath, content, 'utf8');
+    console.log(`[github-sync] กู้คืน ${repoPath} จาก GitHub สำเร็จ (${content.length.toLocaleString()} bytes)`);
   } catch (e) {
-    console.error(`[github-sync] กู้คืน ${repoPath} ล้มเหลว:`, e.message);
+    console.error(`[github-sync] กู้คืน ${repoPath} ล้มเหลว (ไม่เขียนทับไฟล์ local):`, e.message);
   }
 }
 
