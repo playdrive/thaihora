@@ -806,6 +806,85 @@ app.post('/api/analyze', rateLimit, async (req, res) => {
 // ════════════════════════════════════════════════
 const fs   = require('fs');
 
+// ════════════════════════════════════════════════
+// GITHUB-BACKED PERSISTENCE
+// Render free tier ไม่มี persistent disk — ไฟล์ที่เขียนตอน runtime จะหายทุกครั้งที่
+// deploy ใหม่หรือ container restart (spin down เพราะ idle) กลยุทธ์: เก็บไฟล์ .json
+// สำคัญไว้ใน GitHub repo ด้วย ทุกครั้งที่ server เริ่มทำงาน จะดึงไฟล์ล่าสุดจาก
+// GitHub มาเขียนลง disk ก่อน (restore) แล้วทุกครั้งที่บันทึกข้อมูลใหม่ จะ push
+// ขึ้น GitHub ด้วย (backup) — โค้ดส่วนอื่นที่อ่าน/เขียนไฟล์ local ทำงานเหมือนเดิมทุกอย่าง
+// ════════════════════════════════════════════════
+const GITHUB_TOKEN  = process.env.GITHUB_TOKEN;
+const GITHUB_OWNER  = process.env.GITHUB_OWNER  || 'playdrive';
+const GITHUB_REPO   = process.env.GITHUB_REPO   || 'thaihora';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GITHUB_ENABLED = !!GITHUB_TOKEN;
+
+// เก็บ sha ล่าสุดของแต่ละไฟล์ไว้ในหน่วยความจำ (GitHub Contents API ต้องใช้ sha
+// เดิมตอนอัปเดตไฟล์ที่มีอยู่แล้ว ไม่งั้นจะถูกปฏิเสธด้วย 409 Conflict)
+const _ghShaCache = {};
+
+async function ghGetFile(repoPath) {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${repoPath}?ref=${GITHUB_BRANCH}`;
+  const r = await fetch(url, {
+    headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, 'User-Agent': 'ruek-dee-server' }
+  });
+  if (r.status === 404) return null; // ไฟล์ยังไม่เคยถูกสร้างใน repo — ไม่ใช่ error
+  if (!r.ok) throw new Error(`GitHub read ${repoPath} ล้มเหลว: ${r.status} ${await r.text()}`);
+  const json = await r.json();
+  _ghShaCache[repoPath] = json.sha;
+  return Buffer.from(json.content, 'base64').toString('utf8');
+}
+
+async function ghPutFile(repoPath, content) {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${repoPath}`;
+  const body = {
+    message: `อัปเดต ${repoPath} — ${new Date().toISOString()}`,
+    content: Buffer.from(content, 'utf8').toString('base64'),
+    branch: GITHUB_BRANCH,
+  };
+  if (_ghShaCache[repoPath]) body.sha = _ghShaCache[repoPath];
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      'User-Agent': 'ruek-dee-server',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(`GitHub write ${repoPath} ล้มเหลว: ${r.status} ${await r.text()}`);
+  const json = await r.json();
+  _ghShaCache[repoPath] = json.content.sha; // เก็บ sha ใหม่ไว้ใช้ครั้งถัดไป
+}
+
+// เรียกตอน server เริ่มทำงาน: ดึงไฟล์ล่าสุดจาก GitHub มาเขียนทับไฟล์ local
+// ก่อนที่โค้ดส่วนอื่นจะเริ่มอ่าน (กัน local ว่างเปล่าหลัง deploy ใหม่)
+async function restoreFromGitHub(repoPath, localPath) {
+  if (!GITHUB_ENABLED) return;
+  try {
+    const content = await ghGetFile(repoPath);
+    if (content !== null) {
+      fs.writeFileSync(localPath, content, 'utf8');
+      console.log(`[github-sync] กู้คืน ${repoPath} จาก GitHub สำเร็จ`);
+    } else {
+      console.log(`[github-sync] ยังไม่มี ${repoPath} ใน GitHub (เริ่มจากไฟล์ว่าง)`);
+    }
+  } catch (e) {
+    console.error(`[github-sync] กู้คืน ${repoPath} ล้มเหลว:`, e.message);
+  }
+}
+
+// เรียกหลังบันทึกไฟล์ local ทุกครั้ง: push ขึ้น GitHub เพื่อ backup ถาวร
+async function backupToGitHub(repoPath, content) {
+  if (!GITHUB_ENABLED) return;
+  try {
+    await ghPutFile(repoPath, content);
+  } catch (e) {
+    console.error(`[github-sync] backup ${repoPath} ล้มเหลว:`, e.message);
+  }
+}
+
 // เขียนไฟล์แบบ atomic: เขียนลงไฟล์ .tmp ก่อน แล้ว rename ทับตัวจริง
 // (rename เป็น atomic บน filesystem เดียวกัน) — กันไฟล์ DB พังถ้า process ตายกลางการเขียน
 function writeFileAtomicSync(file, data) {
@@ -853,7 +932,9 @@ function saveLottoDB(db) {
   writeFileAtomicSync(LOTTO_DB_PATH, JSON.stringify(db, null, 2));
 }
 async function saveLottoDBAsync(db) {
-  return writeFileAtomic(LOTTO_DB_PATH, JSON.stringify(db, null, 2));
+  const data = JSON.stringify(db, null, 2);
+  await writeFileAtomic(LOTTO_DB_PATH, data);
+  await backupToGitHub('lotto-db.json', data); // สำรองขึ้น GitHub ทันทีหลังเขียน local
 }
 
 // ── lotto-raw-db.json: เก็บ raw response จาก API ก่อน parse ──────────────
@@ -870,7 +951,9 @@ function loadLottoRawDB() {
 }
 
 async function saveLottoRawDBAsync(db) {
-  return writeFileAtomic(LOTTO_RAW_DB_PATH, JSON.stringify(db, null, 2));
+  const data = JSON.stringify(db, null, 2);
+  await writeFileAtomic(LOTTO_RAW_DB_PATH, data);
+  await backupToGitHub('lotto-raw-db.json', data); // สำรองขึ้น GitHub ทันทีหลังเขียน local
 }
 
 // ── lotto-stats-cache.json: cache ผลวิเคราะห์ ──────────────────────────────
@@ -1555,14 +1638,26 @@ app.get('/api/lottery-stats', async (req, res) => {
 // เริ่ม server เฉพาะเมื่อรันไฟล์นี้ตรงๆ (node server.js)
 // เมื่อถูก require จาก test จะไม่เปิด port — ให้ import ฟังก์ชัน pure ไปทดสอบได้
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log('');
-    console.log('  ✦ ฤกษ์ดี Server พร้อมใช้งาน');
-    console.log(`  → http://localhost:${PORT}`);
-    console.log('  → Engine: Meeus + SunCalc + Lahiri Ayanamsa');
-    console.log('  → ไม่มี scraping — ข้อมูลทุกอย่างคำนวณเอง');
-    console.log('');
-  });
+  (async () => {
+    // ก่อนเปิดรับ request ใดๆ ให้กู้คืนข้อมูลจาก GitHub มาไว้ใน local ก่อน
+    // (สำคัญ: ถ้าไม่รอตรงนี้ request แรกๆ อาจมาถึงตอนที่ local ยังว่างเปล่าอยู่)
+    if (GITHUB_ENABLED) {
+      console.log('[github-sync] กำลังกู้คืนข้อมูลจาก GitHub...');
+      await restoreFromGitHub('lotto-db.json', LOTTO_DB_PATH);
+      await restoreFromGitHub('lotto-raw-db.json', LOTTO_RAW_DB_PATH);
+    } else {
+      console.log('[github-sync] ไม่พบ GITHUB_TOKEN — ข้ามการกู้คืน (ข้อมูลจะไม่ถูกเก็บถาวรบน Render free tier)');
+    }
+
+    app.listen(PORT, () => {
+      console.log('');
+      console.log('  ✦ ฤกษ์ดี Server พร้อมใช้งาน');
+      console.log(`  → http://localhost:${PORT}`);
+      console.log('  → Engine: Meeus + SunCalc + Lahiri Ayanamsa');
+      console.log('  → ไม่มี scraping — ข้อมูลทุกอย่างคำนวณเอง');
+      console.log('');
+    });
+  })();
 }
 
 // ── Exports สำหรับการทดสอบ (ไม่กระทบการทำงานปกติ) ──
